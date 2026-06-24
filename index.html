@@ -116,6 +116,18 @@ kbd{font-size:10px;padding:1px 4px;border:1px solid #ddd;border-radius:3px;backg
 .back-btn{width:auto;flex:none;padding:9px 12px;margin-bottom:10px}
 @media(max-width:560px){.lesson-vocab{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
 
+
+/* article module */
+.art-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+.art-card{border:1px solid #e0ddd6;border-radius:12px;background:#fff;padding:12px;min-height:110px}
+.art-card h3{font-size:16px;margin-bottom:6px}
+.art-card.der{border-top:4px solid #3b82f6}.art-card.die{border-top:4px solid #ec4899}.art-card.das{border-top:4px solid #22c55e}
+.art-suffixes{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}.art-suffix{font-size:11px;padding:3px 7px;border-radius:99px;background:#f5f4f0;border:1px solid #e0ddd6}
+.art-word{font-size:30px;font-weight:800;text-align:center;margin:12px 0;color:#1a1a18}.art-hint{text-align:center;font-size:12px;color:#777;margin-bottom:12px}
+.art-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.art-choice{padding:12px;border:1px solid #e0ddd6;border-radius:10px;background:#fff;cursor:pointer;font-weight:700}.art-choice:hover{border-color:#534AB7;background:#faf9ff}.art-choice.ok{background:#E1F5EE;border-color:#0F6E56;color:#085041}.art-choice.no{background:#FCEBEB;border-color:#A32D2D;color:#791F1F}
+.art-feedback{display:none;margin-top:10px;padding:10px;border-radius:9px;font-size:13px;line-height:1.5}.art-feedback.ok{display:block;background:#E1F5EE;color:#085041}.art-feedback.no{display:block;background:#FCEBEB;color:#791F1F}.art-note{font-size:12px;color:#555;line-height:1.7}.art-table{width:100%;border-collapse:collapse;font-size:12px}.art-table th,.art-table td{border-bottom:1px solid #f0eee8;padding:7px;text-align:left;vertical-align:top}.art-table th{font-size:11px;color:#777;background:#faf9f5}
+@media(max-width:640px){.art-grid,.art-actions{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
@@ -123,7 +135,7 @@ kbd{font-size:10px;padding:1px 4px;border:1px solid #ddd;border-radius:3px;backg
 <div class="header">
   <div class="logo">D</div>
   <h1>DeutschA1</h1>
-  <span>Momente A1 · 24 dars</span><span style="background:#E1F5EE;color:#085041">FIX v2</span>
+  <span>Momente A1 · 24 dars</span><span style="background:#E1F5EE;color:#085041">FIX v4 · Artikel</span>
   <span id="hdr-score" class="score-badge" style="margin-left:auto">⭐ 0 ball</span>
 </div>
 
@@ -136,6 +148,7 @@ kbd{font-size:10px;padding:1px 4px;border:1px solid #ddd;border-radius:3px;backg
   <button class="tab" onclick="showTab('typing',this)">⌨️ Yozish</button>
   <button class="tab" onclick="showTab('speak',this)">🔊 Talaffuz</button>
   <button class="tab" onclick="showTab('numbers',this)">🔢 Sonlar</button>
+  <button class="tab" onclick="showTab('articles',this)">📘 Artikllar</button>
 </div>
 
 <div class="content">
@@ -158,6 +171,7 @@ kbd{font-size:10px;padding:1px 4px;border:1px solid #ddd;border-radius:3px;backg
     <button class="btn btn-blue" onclick="showTab('match',document.querySelectorAll('.tab')[4])">🔗 Moslik o'yini</button>
     <button class="btn btn-blue" onclick="showTab('speak',document.querySelectorAll('.tab')[6])">🔊 Talaffuz mashqi</button>
     <button class="btn btn-blue" onclick="showTab('numbers',document.querySelectorAll('.tab')[7])">🔢 Sonlar moduli</button>
+    <button class="btn btn-blue" onclick="showTab('articles',document.querySelectorAll('.tab')[8])">📘 Artikllar o'yini</button>
   </div>
   <div class="card" id="home-progress">
     <div class="card-title">Bugungi progress</div>
@@ -437,6 +451,23 @@ kbd{font-size:10px;padding:1px 4px;border:1px solid #ddd;border-radius:3px;backg
   </div>
 </div>
 
+
+<!-- ARTICLES -->
+<div id="articles" class="sec">
+  <div class="chips" id="art-chips">
+    <span class="chip sel" onclick="setArticleTab('rules',this)">📘 Qoidalar</span>
+    <span class="chip" onclick="setArticleTab('suffixes',this)">🔚 Qo'shimchalar</span>
+    <span class="chip" onclick="setArticleTab('quiz',this)">✅ Test</span>
+    <span class="chip" onclick="setArticleTab('game',this)">🎮 O'yin</span>
+    <span class="chip" onclick="setArticleTab('write',this)">✏️ Yozish</span>
+  </div>
+  <div id="art-rules"></div>
+  <div id="art-suffixes" style="display:none"></div>
+  <div id="art-quiz" style="display:none"></div>
+  <div id="art-game" style="display:none"></div>
+  <div id="art-write" style="display:none"></div>
+</div>
+
 </div><!-- content -->
 
 <script>
@@ -688,6 +719,7 @@ function showTab(id,el){
     if(id==='typing') initTyping();
     if(id==='speak') initSpeak();
     if(id==='numbers'){initNumbers();initPractice();}
+    if(id==='articles') initArticles();
   });
 }
 
@@ -3071,6 +3103,205 @@ document.addEventListener('keydown',e=>{
 function initNumbers(){
   renderCardinal();renderOrdinal();renderQuantity();renderTime();renderMoney();
 }
+
+
+
+// ═══════════════════════
+// ARTICLES MODULE — DER / DIE / DAS
+// Qoida: suffix va ma'no signallari yordam beradi, lekin 100% kafolat emas. Lug'at bilan tekshirish kerak.
+// ═══════════════════════
+const ARTICLE_SUFFIXES={
+  der:[
+    ['-ig','der König, der Honig','Ko‘pincha erkak jinsli otlarda uchraydi; har doim emas.'],
+    ['-ling','der Frühling, der Liebling','Odatda DER.'],
+    ['-ismus','der Tourismus, der Kapitalismus','Mafkura/yo‘nalish nomlari ko‘pincha DER.'],
+    ['-or','der Motor, der Professor','Ko‘pincha DER; istisnolar bor.'],
+    ['-ist','der Polizist, der Journalist','Kasb/rol bildiruvchi erkak shakllari.'],
+    ['-ant','der Student, der Praktikant','Shaxs/kasb bildiruvchi otlar.'],
+    ['-er','der Lehrer, der Arbeiter','Kasb egalari va faol shaxslar; das Fenster kabi istisnolar bor.'],
+    ['-ner','der Rentner, der Partner','Shaxs nomlarida ko‘pincha DER.'],
+    ['-är','der Sekretär, der Millionär','Shaxs nomlarida ko‘pincha DER.'],
+    ['-us','der Rhythmus, der Virus','Ko‘pincha DER, lekin das Virus ham ishlatiladi.']
+  ],
+  die:[
+    ['-ung','die Zeitung, die Übung','Juda kuchli signal: odatda DIE.'],
+    ['-heit','die Freiheit, die Gesundheit','Deyarli doim DIE.'],
+    ['-keit','die Möglichkeit, die Wirklichkeit','Deyarli doim DIE.'],
+    ['-schaft','die Freundschaft, die Mannschaft','Odatda DIE.'],
+    ['-ei','die Bäckerei, die Polizei','Odatda DIE.'],
+    ['-ion','die Nation, die Information','Odatda DIE.'],
+    ['-tät','die Universität, die Qualität','Odatda DIE.'],
+    ['-ik','die Musik, die Grammatik','Ko‘pincha DIE.'],
+    ['-ie','die Familie, die Biologie','Ko‘pincha DIE.'],
+    ['-enz','die Konferenz, die Existenz','Odatda DIE.'],
+    ['-ur','die Kultur, die Natur','Ko‘pincha DIE.'],
+    ['-in','die Lehrerin, die Studentin','Ayol shaxs/kasb nomlari.']
+  ],
+  das:[
+    ['-chen','das Mädchen, das Häuschen','Kichraytirish qo‘shimchasi: deyarli doim DAS.'],
+    ['-lein','das Büchlein, das Fräulein','Kichraytirish qo‘shimchasi: deyarli doim DAS.'],
+    ['-ment','das Dokument, das Instrument','Ko‘pincha DAS.'],
+    ['-um','das Zentrum, das Museum','Ko‘pincha DAS.'],
+    ['-ma','das Thema, das Klima','Ko‘pincha DAS.'],
+    ['-nis','das Ereignis, das Ergebnis','Ko‘pincha DAS, lekin die Erkenntnis kabi istisnolar bor.'],
+    ['-sal','das Schicksal','Kamroq uchraydi; ko‘pincha DAS.'],
+    ['-o','das Auto, das Foto','Qisqartma/chet so‘zlarda ko‘pincha DAS.'],
+    ['-ett','das Ballett','Ko‘pincha DAS.'],
+    ['-il','das Ventil','Ko‘pincha DAS.']
+  ]
+};
+
+const ARTICLE_MEANINGS=[
+  {a:'der',rule:'Erkak shaxslar va ko‘p kasb nomlari',ex:'der Mann, der Vater, der Lehrer, der Arzt'},
+  {a:'der',rule:'Hafta kunlari, oylar, fasllar',ex:'der Montag, der Januar, der Sommer'},
+  {a:'der',rule:'Ko‘p ob-havo hodisalari va tomonlar',ex:'der Regen, der Schnee, der Norden'},
+  {a:'die',rule:'Ayol shaxslar va -in bilan kasb nomlari',ex:'die Frau, die Mutter, die Lehrerin'},
+  {a:'die',rule:'Ko‘p abstrakt tushunchalar, ayniqsa -ung/-heit/-keit/-schaft',ex:'die Übung, die Freiheit, die Möglichkeit'},
+  {a:'die',rule:'Ko‘plik shaklida barcha otlar aniq artiklda die oladi',ex:'der Mann → die Männer; das Kind → die Kinder'},
+  {a:'das',rule:'Kichraytirish shakllari -chen/-lein',ex:'das Mädchen, das Häuschen, das Büchlein'},
+  {a:'das',rule:'Otga aylangan fe’llar va sifatlar',ex:'das Essen, das Lernen, das Gute'},
+  {a:'das',rule:'Ko‘p metallar, tillar va rang nomlari',ex:'das Gold, das Deutsch, das Blau'}
+];
+
+const ARTICLE_WORDS=[
+  {a:'der',noun:'Lehrer',uz:'o‘qituvchi',why:'-er kasb/shaxs nomi: der Lehrer'},
+  {a:'der',noun:'Arbeiter',uz:'ishchi',why:'-er shaxs/kasb nomi: der Arbeiter'},
+  {a:'der',noun:'Frühling',uz:'bahor',why:'-ling va fasl nomi: der Frühling'},
+  {a:'der',noun:'Tourismus',uz:'turizm',why:'-ismus odatda DER: der Tourismus'},
+  {a:'der',noun:'Motor',uz:'motor',why:'-or ko‘pincha DER: der Motor'},
+  {a:'der',noun:'Polizist',uz:'politsiyachi',why:'-ist kasb/shaxs nomi: der Polizist'},
+  {a:'der',noun:'Student',uz:'talaba',why:'-ant/-ent shaxs nomlarida ko‘pincha DER: der Student'},
+  {a:'der',noun:'Montag',uz:'dushanba',why:'Hafta kunlari DER: der Montag'},
+  {a:'der',noun:'Januar',uz:'yanvar',why:'Oy nomlari DER: der Januar'},
+  {a:'der',noun:'Regen',uz:'yomg‘ir',why:'Ko‘p ob-havo hodisalari DER: der Regen'},
+
+  {a:'die',noun:'Zeitung',uz:'gazeta',why:'-ung deyarli doim DIE: die Zeitung'},
+  {a:'die',noun:'Übung',uz:'mashq',why:'-ung deyarli doim DIE: die Übung'},
+  {a:'die',noun:'Freiheit',uz:'erkinlik',why:'-heit deyarli doim DIE: die Freiheit'},
+  {a:'die',noun:'Möglichkeit',uz:'imkoniyat',why:'-keit deyarli doim DIE: die Möglichkeit'},
+  {a:'die',noun:'Freundschaft',uz:'do‘stlik',why:'-schaft odatda DIE: die Freundschaft'},
+  {a:'die',noun:'Bäckerei',uz:'nonvoyxona',why:'-ei odatda DIE: die Bäckerei'},
+  {a:'die',noun:'Information',uz:'ma’lumot',why:'-ion odatda DIE: die Information'},
+  {a:'die',noun:'Universität',uz:'universitet',why:'-tät odatda DIE: die Universität'},
+  {a:'die',noun:'Musik',uz:'musiqa',why:'-ik ko‘pincha DIE: die Musik'},
+  {a:'die',noun:'Lehrerin',uz:'o‘qituvchi ayol',why:'-in ayol shaxs/kasb nomi: die Lehrerin'},
+
+  {a:'das',noun:'Mädchen',uz:'qiz bola',why:'-chen deyarli doim DAS: das Mädchen'},
+  {a:'das',noun:'Häuschen',uz:'uycha',why:'-chen kichraytirish shakli: das Häuschen'},
+  {a:'das',noun:'Büchlein',uz:'kichik kitobcha',why:'-lein kichraytirish shakli: das Büchlein'},
+  {a:'das',noun:'Dokument',uz:'hujjat',why:'-ment ko‘pincha DAS: das Dokument'},
+  {a:'das',noun:'Zentrum',uz:'markaz',why:'-um ko‘pincha DAS: das Zentrum'},
+  {a:'das',noun:'Museum',uz:'muzey',why:'-um ko‘pincha DAS: das Museum'},
+  {a:'das',noun:'Thema',uz:'mavzu',why:'-ma ko‘pincha DAS: das Thema'},
+  {a:'das',noun:'Ereignis',uz:'voqea',why:'-nis ko‘pincha DAS: das Ereignis'},
+  {a:'das',noun:'Essen',uz:'ovqat/yeyish',why:'Otga aylangan fe’l: das Essen'},
+  {a:'das',noun:'Deutsch',uz:'nemis tili',why:'Til nomi ot sifatida: das Deutsch'}
+];
+
+let artTab='rules', artPool=[], artIdx=0, artScore=0, artLocked=false, artWriteLocked=false;
+
+function initArticles(){
+  renderArticleRules();
+  renderArticleSuffixes();
+  if(!artPool.length) startArticleQuiz('quiz');
+}
+function setArticleTab(tab,el){
+  document.querySelectorAll('#art-chips .chip').forEach(c=>c.classList.remove('sel'));
+  if(el) el.classList.add('sel');
+  ['rules','suffixes','quiz','game','write'].forEach(t=>{
+    const box=document.getElementById('art-'+t);
+    if(box) box.style.display=t===tab?'block':'none';
+  });
+  artTab=tab;
+  if(tab==='quiz') startArticleQuiz('quiz');
+  if(tab==='game') startArticleQuiz('game');
+  if(tab==='write') startArticleWrite();
+}
+function renderArticleRules(){
+  const box=document.getElementById('art-rules'); if(!box) return;
+  box.innerHTML=`
+    <div class="card"><div class="card-title">📘 Der / Die / Das — mavzu tushuntirishi</div>
+      <p class="art-note"><b>Nemis tilida har bir ot grammatik jinsga ega:</b> maskulin — <b>der</b>, feminin — <b>die</b>, neytral — <b>das</b>. Bu tabiiy jins bilan har doim mos kelmaydi. Masalan: <b>das Mädchen</b> — “qiz bola”, lekin artikli <b>das</b>, chunki so‘z <b>-chen</b> bilan tugaydi.</p>
+      <p class="art-note" style="margin-top:8px"><b>Muhim:</b> qo‘shimchalar artiklni topishda kuchli signal beradi, lekin bular lug‘at o‘rnini to‘liq bosa olmaydi. Yangi otni doim artikli bilan yodlang: <b>der Tisch</b>, <b>die Lampe</b>, <b>das Buch</b>.</p>
+    </div>
+    <div class="art-grid">
+      <div class="art-card der"><h3>DER</h3><div class="art-note">Erkak shaxslar, hafta kunlari, oylar, fasllar, ko‘p kasb nomlari.</div><div class="art-suffixes">${ARTICLE_SUFFIXES.der.slice(0,8).map(s=>`<span class="art-suffix">${s[0]}</span>`).join('')}</div></div>
+      <div class="art-card die"><h3>DIE</h3><div class="art-note">Ayol shaxslar, ko‘p abstrakt tushunchalar, ko‘plikdagi barcha otlar.</div><div class="art-suffixes">${ARTICLE_SUFFIXES.die.slice(0,8).map(s=>`<span class="art-suffix">${s[0]}</span>`).join('')}</div></div>
+      <div class="art-card das"><h3>DAS</h3><div class="art-note">Kichraytirish shakllari, otga aylangan fe’llar, ko‘p neytral chet so‘zlar.</div><div class="art-suffixes">${ARTICLE_SUFFIXES.das.slice(0,8).map(s=>`<span class="art-suffix">${s[0]}</span>`).join('')}</div></div>
+    </div>
+    <div class="card"><div class="card-title">Qaysi holatda qaysi artikl olinadi?</div>
+      <table class="art-table"><thead><tr><th>Artikl</th><th>Holat / qoida</th><th>Misollar</th></tr></thead><tbody>
+      ${ARTICLE_MEANINGS.map(r=>`<tr><td><b>${r.a}</b></td><td>${r.rule}</td><td>${r.ex}</td></tr>`).join('')}
+      </tbody></table>
+    </div>
+    <div class="card"><div class="card-title">A1 uchun yodlash algoritmi</div>
+      <ol class="art-note" style="padding-left:18px">
+        <li>Avval ma’nosiga qarang: shaxsmi, kun/oy/faslmi, ayol kasbimi?</li>
+        <li>Keyin so‘z oxiriga qarang: <b>-ung/-heit/-keit → die</b>, <b>-chen/-lein → das</b>, <b>-ismus/-ling → der</b>.</li>
+        <li>Signal topilmasa, so‘zni lug‘atda artikli bilan yodlang.</li>
+        <li>Ko‘plikda aniq artikl har doim <b>die</b>: die Bücher, die Frauen, die Kinder.</li>
+      </ol>
+    </div>`;
+}
+function renderArticleSuffixes(){
+  const box=document.getElementById('art-suffixes'); if(!box) return;
+  const group=(name,arr,cls)=>`<div class="art-card ${cls}"><h3>${name}</h3>${arr.map(s=>`<div style="border-bottom:1px solid #f0eee8;padding:7px 0"><b>${s[0]}</b><br><span style="font-size:12px;color:#555">${s[1]}</span><br><span style="font-size:11px;color:#888">${s[2]}</span></div>`).join('')}</div>`;
+  box.innerHTML=`<div class="card"><div class="card-title">🔚 Rasm asosidagi artikl qo‘shimchalari</div><p class="art-note">Quyidagi jadval rasmdagi qo‘shimchalarni o‘quv platforma uchun tartiblangan ko‘rinishga keltiradi. Takroriy va istisnoli suffixlar alohida izoh bilan berildi.</p></div><div class="art-grid">${group('DER signallari',ARTICLE_SUFFIXES.der,'der')}${group('DIE signallari',ARTICLE_SUFFIXES.die,'die')}${group('DAS signallari',ARTICLE_SUFFIXES.das,'das')}</div>`;
+}
+function startArticleQuiz(mode){
+  const box=document.getElementById('art-'+mode); if(!box) return;
+  artPool=[...ARTICLE_WORDS].sort(()=>Math.random()-.5).slice(0,15);
+  artIdx=0;artScore=0;artLocked=false;
+  showArticleQuestion(mode);
+}
+function showArticleQuestion(mode){
+  const box=document.getElementById('art-'+mode); if(!box) return;
+  if(artIdx>=artPool.length){
+    box.innerHTML=`<div class="result"><div class="rscore" style="color:#0F6E56">${artScore}/${artPool.length}</div><div class="rmsg">Natija: ${Math.round(artScore/artPool.length*100)}%</div><button class="btn btn-blue" onclick="startArticleQuiz('${mode}')">Qayta boshlash</button></div>`;
+    if(artScore>0) uS(artScore*2,0);
+    return;
+  }
+  const w=artPool[artIdx];
+  const title=mode==='game'?'🎮 O‘yin: so‘zni to‘g‘ri artikl savatiga joylang':'✅ Test: to‘g‘ri artiklni tanlang';
+  box.innerHTML=`<div class="card"><div class="card-title">${title}</div><div class="pb"><div class="pf" style="width:${Math.round(artIdx/artPool.length*100)}%"></div></div><div class="pinfo"><span>${artIdx+1}/${artPool.length}</span><span>${artScore} ball</span></div><div class="art-word">___ ${w.noun}</div><div class="art-hint">${w.uz} · maslahat: so‘z oxiri va ma’nosiga qarang</div><div class="art-actions"><button class="art-choice" onclick="answerArticle('der','${mode}')">der</button><button class="art-choice" onclick="answerArticle('die','${mode}')">die</button><button class="art-choice" onclick="answerArticle('das','${mode}')">das</button></div><div id="art-fb" class="art-feedback"></div></div>`;
+}
+function answerArticle(sel,mode){
+  if(artLocked)return; artLocked=true;
+  const w=artPool[artIdx];
+  document.querySelectorAll('#art-'+mode+' .art-choice').forEach(b=>{
+    if(b.textContent.trim()===w.a)b.classList.add('ok');
+    else if(b.textContent.trim()===sel)b.classList.add('no');
+  });
+  const fb=document.getElementById('art-fb');
+  if(sel===w.a){artScore++;fb.className='art-feedback ok';fb.innerHTML=`✓ To‘g‘ri: <b>${w.a} ${w.noun}</b><br>${w.why}`;speak(w.a+' '+w.noun);} 
+  else {fb.className='art-feedback no';fb.innerHTML=`✗ Noto‘g‘ri. To‘g‘ri javob: <b>${w.a} ${w.noun}</b><br>${w.why}`;speak(w.a+' '+w.noun);}
+  setTimeout(()=>{artIdx++;artLocked=false;showArticleQuestion(mode);},1700);
+}
+function startArticleWrite(){
+  artPool=[...ARTICLE_WORDS].sort(()=>Math.random()-.5).slice(0,12);
+  artIdx=0;artScore=0;artWriteLocked=false;
+  showArticleWrite();
+}
+function showArticleWrite(){
+  const box=document.getElementById('art-write'); if(!box) return;
+  if(artIdx>=artPool.length){box.innerHTML=`<div class="result"><div class="rscore" style="color:#0F6E56">${artScore}/${artPool.length}</div><div class="rmsg">Yozish mashqi tugadi</div><button class="btn btn-blue" onclick="startArticleWrite()">Qayta boshlash</button></div>`;return;}
+  const w=artPool[artIdx];
+  box.innerHTML=`<div class="card"><div class="card-title">✏️ Artiklli yozish mashqi</div><div class="pinfo"><span>${artIdx+1}/${artPool.length}</span><span>${artScore} ball</span></div><div class="art-word">${w.noun}</div><div class="art-hint">${w.uz}. Javobga faqat <b>der</b>, <b>die</b> yoki <b>das</b> yozing.</div><input class="tinput" id="art-write-input" placeholder="der / die / das" autocomplete="off"><div class="btn-row" style="margin-top:8px"><button class="btn btn-blue" onclick="checkArticleWrite()">✓ Tekshirish</button><button class="btn" onclick="artIdx++;showArticleWrite()">O‘tkazib yuborish</button></div><div id="art-write-fb" class="art-feedback"></div></div>`;
+  setTimeout(()=>document.getElementById('art-write-input')?.focus(),80);
+}
+function checkArticleWrite(){
+  if(artWriteLocked)return;
+  const inp=document.getElementById('art-write-input'); if(!inp)return;
+  const val=inp.value.trim().toLowerCase(); const w=artPool[artIdx]; const fb=document.getElementById('art-write-fb');
+  artWriteLocked=true;
+  if(val===w.a){artScore++;inp.className='tinput ok';fb.className='art-feedback ok';fb.innerHTML=`✓ To‘g‘ri: <b>${w.a} ${w.noun}</b><br>${w.why}`;speak(w.a+' '+w.noun);} 
+  else {inp.className='tinput no';fb.className='art-feedback no';fb.innerHTML=`✗ To‘g‘ri javob: <b>${w.a} ${w.noun}</b><br>${w.why}`;speak(w.a+' '+w.noun);}
+  setTimeout(()=>{artIdx++;artWriteLocked=false;showArticleWrite();},1700);
+}
+
+document.addEventListener('keydown',e=>{
+  if(document.getElementById('articles')?.classList.contains('active') && e.key==='Enter') checkArticleWrite();
+});
 
 
 // Agar brauzer DOMContentLoaded ni oldin tugatgan bo'lsa, bootApp shu yerda ham xavfsiz chaqiriladi.
